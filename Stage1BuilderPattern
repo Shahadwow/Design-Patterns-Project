@@ -1,0 +1,98 @@
+public class Calculation {
+    private float operand1;
+    private float operand2;
+    private String operator;
+
+    private Calculation(float operand1, float operand2, String operator) {
+        this.operand1 = operand1;
+        this.operand2 = operand2;
+        this.operator = operator;
+    }
+
+    public String compute() {
+        float result;
+        switch (operator) {
+            case "+" -> result = operand1 + operand2;
+            case "-" -> result = operand1 - operand2;
+            case "×" -> result = operand1 * operand2;
+            case "÷" -> {
+                if (operand2 == 0)
+                    return "Error";
+                result = operand1 / operand2;
+            }
+            default -> {
+                return "Invalid";
+            }
+        }
+        return (result - (int) result) != 0 ? Float.toString(result) : Integer.toString((int) result);
+    }
+
+    // Builder Class
+    public static class Builder {
+        private String operand1;
+        private String operand2;
+        private String operator;
+
+        public Builder setOperand1(String operand1) {
+            this.operand1 = operand1;
+            return this;
+        }
+
+        public Builder setOperand2(String operand2) {
+            this.operand2 = operand2;
+            return this;
+        }
+
+        public Builder setOperator(String operator) {
+            this.operator = operator;
+            return this;
+        }
+
+        public Calculation build() throws IllegalArgumentException {
+            if (operand1 == null || operand2 == null) {
+                throw new IllegalArgumentException("Operands cannot be null");
+            }
+
+            float op1 = Float.parseFloat(operand1);
+            float op2 = Float.parseFloat(operand2);
+
+            return new Calculation(op1, op2, operator);
+        }
+    }
+}
+
+// Calculator Class
+
+public class Calculator {
+    private String currentOperand = "";
+    private String previousOperand = "";
+    private String operation = "";
+
+    public void compute() {
+        if (this.currentOperand.equals("") || this.previousOperand.equals("")) {
+            return;
+        }
+
+        try {
+            Calculation calculation = new Calculation.Builder()
+                .setOperand1(this.previousOperand)
+                .setOperand2(this.currentOperand)
+                .setOperator(this.operation)
+                .build();
+
+            this.currentOperand = calculation.compute();
+        } catch (Exception e) {
+            this.clear();
+            this.currentOperand = "Error";
+        }
+
+        this.previousOperand = "";
+        this.operation = "";
+    }
+
+    public void clear() {
+        this.previousOperand = "";
+        this.currentOperand = "";
+        this.operation = "";
+    }
+}
